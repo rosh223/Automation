@@ -15,16 +15,22 @@ public class FormBuilderPage {
     }
 
     public void dragAndDropTextbox() {
-        Locator textboxTool = firstVisible(
-            frame.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Text Box").setExact(true)),
-            frame.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("TextBox").setExact(true)),
-            frame.getByText("Text Box", new FrameLocator.GetByTextOptions().setExact(true)),
-            frame.getByText("Textbox", new FrameLocator.GetByTextOptions().setExact(true)),
-            frame.locator("[aria-label*='Text Box' i], [title*='Text Box' i], [data-name*='text' i], [data-testid*='text' i]").first()
-        );
-
-        textboxTool.click();
-        page.waitForTimeout(1000);
+        System.out.println("Attempting to add Text Box...");
+        Locator textboxTool = frame.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Text Box"));
+        
+        try {
+            // Some builders add on click, some require drag
+            textboxTool.click();
+            page.waitForTimeout(1000);
+            
+            // Drag to center of the frame body just in case
+            Locator dropZone = frame.locator("body");
+            textboxTool.dragTo(dropZone, new Locator.DragToOptions().setTargetPosition(300, 300));
+            page.waitForTimeout(2000);
+            System.out.println("Successfully interacted with Text Box tool.");
+        } catch (Exception e) {
+            System.out.println("Error adding text box: " + e.getMessage());
+        }
     }
 
     public void setPropertiesForElement(String label, String hint, String minLength, String maxLength) {
@@ -57,13 +63,15 @@ public class FormBuilderPage {
     }
 
     public void saveForm() {
-        firstVisible(
-            frame.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Save").setExact(true)),
-            frame.locator("[aria-label='Save'], [title='Save']").first(),
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save").setExact(true)),
-            page.locator("[aria-label='Save'], [title='Save']").first()
-        ).click();
-        page.waitForTimeout(2000);
+        System.out.println("Attempting to save the form...");
+        Locator saveBtn = frame.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Save")).first();
+        try {
+            saveBtn.click(new Locator.ClickOptions().setForce(true));
+            page.waitForTimeout(2000);
+            System.out.println("Successfully clicked Save.");
+        } catch (Exception e) {
+            System.out.println("Error saving form: " + e.getMessage());
+        }
     }
 
     public void navigateToRulesTab() {

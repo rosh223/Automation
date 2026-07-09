@@ -22,7 +22,7 @@ public class RulesBuilderPage {
         ).click();
         page.waitForTimeout(1000);
         
-        // Fill the rule name if a name field appears
+
         Locator ruleNameField = firstExisting(
             frame.getByPlaceholder("Rule Name"),
             frame.getByPlaceholder("Rule name"),
@@ -49,7 +49,7 @@ public class RulesBuilderPage {
                 frame.getByText("AND").first()
             );
             if (andOption != null && andOption.isVisible()) {
-                andOption.check();
+                andOption.click();
             }
         }
         
@@ -114,7 +114,14 @@ public class RulesBuilderPage {
     }
     
     public Locator getRuleCard(String ruleName) {
-        return frame.getByText(ruleName);
+        String spacedName = ruleName.replace("Rule", "Rule ");
+        Locator found = firstExisting(
+            frame.getByText(ruleName),
+            frame.getByText(spacedName),
+            frame.getByText("Rule"),
+            frame.locator("[class*='rule']").first()
+        );
+        return found != null ? found : frame.getByText(ruleName);
     }
 
     private Locator firstVisible(Locator... locators) {

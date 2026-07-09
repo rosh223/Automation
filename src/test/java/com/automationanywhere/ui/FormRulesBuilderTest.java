@@ -55,8 +55,8 @@ public class FormRulesBuilderTest {
         formBuilderPage.navigateToRulesTab();
 
         // Assert: Add Rule button is visible and functional
-        assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
-            new Page.GetByRoleOptions().setName("Add Rule"))).isVisible();
+        assertThat(page.frameLocator("iframe").first().getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+            new com.microsoft.playwright.FrameLocator.GetByRoleOptions().setName("Add rule"))).isVisible();
 
         // Step 6: Build Rules
         RulesBuilderPage rulesBuilderPage = new RulesBuilderPage(page);
