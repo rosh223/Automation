@@ -21,9 +21,8 @@ public class ApiConfig {
                 .setAccept(ContentType.JSON);
 
         if (authToken != null && !authToken.isEmpty()) {
-            // Usually it's Authorization: Bearer <token> or X-Authorization
-            // Depending on what we find in Network tab
-            builder.addHeader("X-Authorization", authToken);
+            // AA v2 APIs use standard Bearer token authorization
+            builder.addHeader("Authorization", "Bearer " + authToken);
         }
 
         return builder.build();

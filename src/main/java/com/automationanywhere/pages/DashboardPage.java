@@ -10,18 +10,29 @@ public class DashboardPage {
     }
 
     public void navigateToAutomation() {
-        page.getByRole(com.microsoft.playwright.options.AriaRole.LINK, 
-            new Page.GetByRoleOptions().setName("Automation")).click();
+        page.getByLabel("Automation", new Page.GetByLabelOptions().setExact(true)).click();
         page.waitForLoadState();
+        page.waitForTimeout(3000);
     }
 
     public void createNewForm(String formName) {
+        // Click "Create" button (use first() since there are two Create buttons)
         page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, 
-            new Page.GetByRoleOptions().setName("Create New")).click();
-        page.getByText("Form").click();
-        page.getByPlaceholder("Name", new Page.GetByPlaceholderOptions().setExact(false)).fill(formName);
+            new Page.GetByRoleOptions().setName("Create").setExact(true)).first().click();
+        page.waitForTimeout(1000);
+        
+        // Select "Form…" from the dropdown
         page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, 
-            new Page.GetByRoleOptions().setName("Create & Edit")).click();
+            new Page.GetByRoleOptions().setName("Form")).click();
+        page.waitForTimeout(2000);
+
+        // Fill form name using the label "Name" (placeholder is "Required")
+        page.getByLabel("Name", new Page.GetByLabelOptions().setExact(true)).fill(formName);
+        
+        // Click "Create & edit" (lowercase 'e')
+        page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, 
+            new Page.GetByRoleOptions().setName("Create & edit")).click();
         page.waitForLoadState();
+        page.waitForTimeout(5000); // Wait for form builder to fully load
     }
 }

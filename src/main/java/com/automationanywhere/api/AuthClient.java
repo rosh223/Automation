@@ -18,15 +18,15 @@ public class AuthClient {
 
             Response response = RestAssured
                     .given()
-                        .spec(ApiConfig.getRequestSpec(null)) // Pass null since we don't have a token yet
+                        .spec(ApiConfig.getRequestSpec(null))
                         .body(loginPayload)
                     .when()
-                        .post("/v1/authentication") // NOTE: Adjust to the actual AA login endpoint
+                        .post("/v2/authentication")
                     .then()
                         .statusCode(200)
                         .extract().response();
 
-            // Extract the token (e.g. JWT) from the response JSON. Adjust the jsonPath based on real schema.
+            // AA returns the token directly in the response body
             authToken = response.jsonPath().getString("token");
         }
         return authToken;

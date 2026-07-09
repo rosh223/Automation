@@ -10,11 +10,11 @@ public class LoginPage {
     }
 
     public void login(String username, String password) {
-        // Uses generic locator strategies - adjust as necessary for AA CE real DOM
-        page.getByPlaceholder("Username", new Page.GetByPlaceholderOptions().setExact(false)).fill(username);
-        page.getByPlaceholder("Password", new Page.GetByPlaceholderOptions().setExact(false)).fill(password);
+        // Use setExact(true) to avoid matching "Remember my username" checkbox
+        page.getByLabel("Username", new Page.GetByLabelOptions().setExact(true)).fill(username);
+        page.getByLabel("Password", new Page.GetByLabelOptions().setExact(true)).fill(password);
         page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, 
-            new Page.GetByRoleOptions().setName("Login")).click();
+            new Page.GetByRoleOptions().setName("Log in")).click();
         page.waitForLoadState();
     }
 }

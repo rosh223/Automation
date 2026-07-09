@@ -6,6 +6,7 @@ import com.automationanywhere.pages.LoginPage;
 import com.automationanywhere.pages.RulesBuilderPage;
 import com.automationanywhere.utils.ConfigReader;
 import com.automationanywhere.utils.PlaywrightFactory;
+import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Page;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,46 +19,59 @@ public class FormRulesBuilderTest {
 
     @BeforeAll
     public static void setUp() {
-        // Set headless=false for local visual debugging; Docker will run headless
         page = PlaywrightFactory.initBrowser("chromium", false);
-        page.navigate(ConfigReader.get("AA_BASE_URL"));
+        String baseUrl = ConfigReader.get("AA_BASE_URL");
+        if (baseUrl == null || baseUrl.isEmpty()) {
+            baseUrl = "https://community.cloud.automationanywhere.digital";
+        }
+        page.navigate(baseUrl);
+        page.waitForLoadState();
     }
 
     @Test
     public void testFormAndRulesBuilder() {
+        // Step 1: Login
         LoginPage loginPage = new LoginPage(page);
         loginPage.login(ConfigReader.get("AA_USERNAME"), ConfigReader.get("AA_PASSWORD"));
 
+        // Step 2: Navigate and create form
         DashboardPage dashboardPage = new DashboardPage(page);
         dashboardPage.navigateToAutomation();
-        dashboardPage.createNewForm("AutomationAssignmentForm");
+        dashboardPage.createNewForm("AutomationTestForm");
 
+        // Step 3: Drag and drop textboxes
         FormBuilderPage formBuilderPage = new FormBuilderPage(page);
-        formBuilderPage.dragAndDropTextbox(1);
+        formBuilderPage.dragAndDropTextbox(); // First textbox
         formBuilderPage.setPropertiesForElement("TextBox1", "Hint1", "1", "50");
         
-        formBuilderPage.dragAndDropTextbox(2);
+        formBuilderPage.dragAndDropTextbox(); // Second textbox
         formBuilderPage.setPropertiesForElement("TextBox2", "Hint2", "1", "50");
 
+        // Step 4: Save form
         formBuilderPage.saveForm();
+
+        // Step 5: Navigate to Rules tab
         formBuilderPage.navigateToRulesTab();
 
+        // Get iframe reference for assertions
+        FrameLocator frame = page.frameLocator("iframe").first();
+
+        // Assert: Add Rule button is visible inside the iframe
+        assertThat(frame.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+            new FrameLocator.GetByRoleOptions().setName("Add Rule"))).isVisible();
+
+        // Step 6: Build Rules
         RulesBuilderPage rulesBuilderPage = new RulesBuilderPage(page);
-        
-        // Assert: Add Rule button is visible
-        assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON, 
-            new com.microsoft.playwright.Page.GetByRoleOptions().setName("Add Rule"))).isVisible();
-            
-        // Build Rule 1
         rulesBuilderPage.createRule("Rule1");
         rulesBuilderPage.addCondition("TextBox1", "Is Not Empty", false);
         rulesBuilderPage.addCondition("TextBox1", "Contains", true); // AND mode
         rulesBuilderPage.addAction("Set Value", "TextBox2");
 
-        // Build Rule 2 and 3 via Context Menu
+        // Step 7: Add Rule2 and Rule3 via context menu
         rulesBuilderPage.addRuleBelow("Rule2");
         rulesBuilderPage.addRuleBelow("Rule3");
 
+        // Step 8: Save and verify
         formBuilderPage.saveForm();
 
         // Assert: Rules exist and persist
