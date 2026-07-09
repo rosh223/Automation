@@ -15,7 +15,7 @@ services:
       # Persist Maven dependencies across runs so it doesn't download the internet every time
       - maven-repo:/root/.m2
     # The command to execute when the container starts
-    command: ["mvn", "clean", "test", "allure:report"]
+    command: ["mvn", "clean", "test", "-Dheadless=true"]
 
 volumes:
   maven-repo:
