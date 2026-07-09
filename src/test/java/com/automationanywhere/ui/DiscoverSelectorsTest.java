@@ -7,8 +7,10 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled("Selector discovery utility. Run manually only when the AA UI changes.")
 public class DiscoverSelectorsTest {
 
     private static Page page;
@@ -44,7 +46,8 @@ public class DiscoverSelectorsTest {
         page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
             new Page.GetByRoleOptions().setName("Form")).click();
         page.waitForTimeout(2000);
-        page.getByLabel("Name", new Page.GetByLabelOptions().setExact(true)).fill("DiagFormBuilder2");
+        page.getByLabel("Name", new Page.GetByLabelOptions().setExact(true))
+            .fill("DiagFormBuilder_" + System.currentTimeMillis());
         page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
             new Page.GetByRoleOptions().setName("Create & edit")).click();
         page.waitForLoadState();

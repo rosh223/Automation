@@ -12,8 +12,9 @@ public class PlaywrightFactory {
 
     public static Page initBrowser(String browserName, boolean headless) {
         playwright.set(Playwright.create());
-        
-        BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions().setHeadless(headless);
+
+        boolean runHeadless = Boolean.parseBoolean(System.getProperty("headless", String.valueOf(headless)));
+        BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions().setHeadless(runHeadless);
         
         switch (browserName.toLowerCase()) {
             case "firefox":
@@ -29,6 +30,7 @@ public class PlaywrightFactory {
         }
 
         page.set(browser.get().newPage());
+        page.get().setDefaultTimeout(20_000);
         return getPage();
     }
 

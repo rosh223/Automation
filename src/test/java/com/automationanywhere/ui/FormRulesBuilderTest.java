@@ -6,7 +6,6 @@ import com.automationanywhere.pages.LoginPage;
 import com.automationanywhere.pages.RulesBuilderPage;
 import com.automationanywhere.utils.ConfigReader;
 import com.automationanywhere.utils.PlaywrightFactory;
-import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Page;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,6 +29,8 @@ public class FormRulesBuilderTest {
 
     @Test
     public void testFormAndRulesBuilder() {
+        String formName = "AutomationTestForm_" + System.currentTimeMillis();
+
         // Step 1: Login
         LoginPage loginPage = new LoginPage(page);
         loginPage.login(ConfigReader.get("AA_USERNAME"), ConfigReader.get("AA_PASSWORD"));
@@ -37,7 +38,7 @@ public class FormRulesBuilderTest {
         // Step 2: Navigate and create form
         DashboardPage dashboardPage = new DashboardPage(page);
         dashboardPage.navigateToAutomation();
-        dashboardPage.createNewForm("AutomationTestForm");
+        dashboardPage.createNewForm(formName);
 
         // Step 3: Drag and drop textboxes
         FormBuilderPage formBuilderPage = new FormBuilderPage(page);
@@ -53,12 +54,9 @@ public class FormRulesBuilderTest {
         // Step 5: Navigate to Rules tab
         formBuilderPage.navigateToRulesTab();
 
-        // Get iframe reference for assertions
-        FrameLocator frame = page.frameLocator("iframe").first();
-
-        // Assert: Add Rule button is visible inside the iframe
-        assertThat(frame.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
-            new FrameLocator.GetByRoleOptions().setName("Add Rule"))).isVisible();
+        // Assert: Add Rule button is visible and functional
+        assertThat(page.getByRole(com.microsoft.playwright.options.AriaRole.BUTTON,
+            new Page.GetByRoleOptions().setName("Add Rule"))).isVisible();
 
         // Step 6: Build Rules
         RulesBuilderPage rulesBuilderPage = new RulesBuilderPage(page);
