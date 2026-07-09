@@ -1,6 +1,5 @@
 package com.automationanywhere.ui;
 
-import com.automationanywhere.pages.DashboardPage;
 import com.automationanywhere.pages.LoginPage;
 import com.automationanywhere.utils.ConfigReader;
 import com.automationanywhere.utils.PlaywrightFactory;
@@ -31,50 +30,54 @@ public class DiagnosticPayloadInterceptorTest {
         LoginPage loginPage = new LoginPage(page);
         loginPage.login(ConfigReader.get("AA_USERNAME"), ConfigReader.get("AA_PASSWORD"));
 
-        System.out.println("=== ATTACHING NETWORK INTERCEPTOR ===");
+        System.out.println("=== ATTACHING NETWORK INTERCEPTOR - CAPTURING ALL POST/PUT TO AA DOMAIN ===");
         page.onRequest(request -> {
-            if ("POST".equalsIgnoreCase(request.method()) || "PUT".equalsIgnoreCase(request.method())) {
-                if (request.url().contains("learning-instance") || request.url().contains("document-automation") || request.url().contains("iqbot")) {
-                    System.out.println("\n\n>>> CAPTURED API REQUEST <<<");
-                    System.out.println("URL: " + request.url());
-                    System.out.println("Method: " + request.method());
-                    System.out.println("Payload: \n" + request.postData());
-                    System.out.println(">>> ==================== <<<\n\n");
+            String method = request.method();
+            if ("POST".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)) {
+                String url = request.url();
+                // Capture ALL POST/PUT to the automationanywhere domain, skip pendo/analytics
+                if (url.contains("automationanywhere") && !url.contains("pendo") && !url.contains("registration")) {
+                    System.out.println("\n>>> CAPTURED " + method + " REQUEST <<<");
+                    System.out.println("URL: " + url);
+                    String postData = request.postData();
+                    if (postData != null) {
+                        System.out.println("Payload: " + postData);
+                    } else {
+                        System.out.println("Payload: (null/empty)");
+                    }
+                    System.out.println(">>> END <<<\n");
                 }
             }
         });
 
-        DashboardPage dashboardPage = new DashboardPage(page);
-        // We don't have a direct method to go to Document Automation -> Learning Instances in DashboardPage yet.
-        // Let's just navigate directly via URL since we are logged in.
         String baseUrl = ConfigReader.get("AA_BASE_URL");
         if (baseUrl == null || baseUrl.isEmpty()) {
             baseUrl = "https://community.cloud.automationanywhere.digital";
         }
         page.navigate(baseUrl + "/#/modules/cognitive/iqbot/pages/learning-instances");
         page.waitForLoadState();
-        page.waitForTimeout(5000); // let UI load
+        page.waitForTimeout(8000);
 
-        System.out.println("Clicking 'Create new'...");
+        System.out.println("=== Clicking 'Create new' ===");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Create new")).click();
-        page.waitForTimeout(2000);
-        
-        System.out.println("Filling Name...");
+        page.waitForTimeout(3000);
+
+        System.out.println("=== Filling Name: " + instanceName + " ===");
         page.locator("input[type='text']").first().fill(instanceName);
         page.waitForTimeout(1000);
 
-        System.out.println("Clicking 'Next'...");
+        System.out.println("=== Clicking 'Next' ===");
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Next")).click();
-        page.waitForTimeout(4000);
+        page.waitForTimeout(8000);
 
-        System.out.println("Clicking 'Create' (if present)...");
+        System.out.println("=== Attempting 'Create' button ===");
         try {
             page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Create")).click();
+            page.waitForTimeout(5000);
         } catch (Exception e) {
-            System.out.println("Create button not found, maybe 'Next' already submitted it.");
+            System.out.println("Create button not found or not clickable: " + e.getMessage());
         }
-        page.waitForTimeout(4000);
-        System.out.println("=== FINISHED CAPTURING ===");
+        System.out.println("=== FINISHED ===");
     }
 
     @AfterAll
