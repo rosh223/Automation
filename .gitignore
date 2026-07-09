@@ -29,3 +29,8 @@ build/
 
 ### Secrets ###
 .env
+
+### Assignment Files ###
+Intern_AutomationAssignmentv1.docx
+Intern_AutomationAssignmentv1.txt
+*.docx
