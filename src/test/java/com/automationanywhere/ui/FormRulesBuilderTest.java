@@ -10,8 +10,13 @@ import com.microsoft.playwright.Page;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
+@Tag("UI")
+@Tag("UseCase1")
+@DisplayName("Use Case 1: Form with Rules Builder (UI Automation)")
 public class FormRulesBuilderTest {
 
     private static Page page;
@@ -28,6 +33,7 @@ public class FormRulesBuilderTest {
     }
 
     @Test
+    @DisplayName("Automate the full Rules Builder flow using POM")
     public void testFormAndRulesBuilder() {
         String formName = "AutomationTestForm_" + System.currentTimeMillis();
 

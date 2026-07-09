@@ -8,7 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 
+@Tag("API")
+@Tag("UseCase2")
+@DisplayName("Use Case 2: Learning Instance API Flow (API Automation)")
 public class LearningInstanceApiTest {
 
     private static String token;
@@ -20,6 +25,7 @@ public class LearningInstanceApiTest {
     }
 
     @Test
+    @DisplayName("Create Learning Instance with document type Invoice via API")
     public void testCreateLearningInstance() {
         System.out.println("=== TEST: CREATE LEARNING INSTANCE ===");
 
