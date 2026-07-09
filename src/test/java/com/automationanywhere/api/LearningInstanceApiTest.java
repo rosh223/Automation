@@ -23,12 +23,15 @@ public class LearningInstanceApiTest {
         // Prepare the payload (Document type: Invoice)
         LearningInstanceRequest requestPayload = new LearningInstanceRequest(
                 "TestInvoiceInstance_Automated_" + System.currentTimeMillis(),
-                "33DED827-3DC4-4201-B478-7C15B94AF522", // Domain ID (Invoices)
-                "Automated API Test for Invoice Document Type",
-                "B62EFA19-3592-4D2B-910A-E9C1C7DAE1A9", // Language ID (English)
-                "en-US", // locale is usually string code, try en-US
-                "B4DBACBA-5C86-4E32-A522-F668D48CC74B"  // Provider ID
+                "Automated API Test for Invoice Document Type"
         );
+
+        // API Endpoint with domain ID in path, language and provider as query params
+        String domainId = "33DED827-3DC4-4201-B478-7C15B94AF522";
+        String languageId = "B62EFA19-3592-4D2B-910A-E9C1C7DAE1A9";
+        String providerId = "B4DBACBA-5C86-4E32-A522-F668D48CC74B";
+        String endpoint = String.format("/cognitive/v3/learninginstances/%s?language=%s&provider=%s", 
+                                        domainId, languageId, providerId);
 
         // Execute API Request
         Response response = RestAssured
@@ -36,7 +39,7 @@ public class LearningInstanceApiTest {
                 .spec(ApiConfig.getRequestSpec(token))
                 .body(requestPayload)
             .when()
-                .post("/cognitive/v3/learninginstances") // Correct endpoint
+                .post(endpoint) // Updated endpoint
             .then()
                 .spec(ApiConfig.getResponseSpec())
                 .extract().response();
