@@ -30,7 +30,7 @@ public class PlaywrightFactory {
         }
 
         page.set(browser.get().newPage());
-        page.get().setDefaultTimeout(20_000);
+        page.get().setDefaultTimeout(60_000);
         return getPage();
     }
 

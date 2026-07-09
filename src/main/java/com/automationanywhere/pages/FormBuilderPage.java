@@ -1,23 +1,26 @@
 package com.automationanywhere.pages;
 
+import com.microsoft.playwright.FrameLocator;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 
 public class FormBuilderPage {
     private final Page page;
+    private final FrameLocator frame;
 
     public FormBuilderPage(Page page) {
         this.page = page;
+        this.frame = page.frameLocator("iframe").first();
     }
 
     public void dragAndDropTextbox() {
         Locator textboxTool = firstVisible(
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Text Box").setExact(true)),
-            page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("TextBox").setExact(true)),
-            page.getByText("Text Box", new Page.GetByTextOptions().setExact(true)),
-            page.getByText("Textbox", new Page.GetByTextOptions().setExact(true)),
-            page.locator("[aria-label*='Text Box' i], [title*='Text Box' i], [data-name*='text' i], [data-testid*='text' i]").first()
+            frame.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Text Box").setExact(true)),
+            frame.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("TextBox").setExact(true)),
+            frame.getByText("Text Box", new FrameLocator.GetByTextOptions().setExact(true)),
+            frame.getByText("Textbox", new FrameLocator.GetByTextOptions().setExact(true)),
+            frame.locator("[aria-label*='Text Box' i], [title*='Text Box' i], [data-name*='text' i], [data-testid*='text' i]").first()
         );
 
         textboxTool.click();
@@ -25,36 +28,38 @@ public class FormBuilderPage {
     }
 
     public void setPropertiesForElement(String label, String hint, String minLength, String maxLength) {
-        clickIfVisible(page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("Properties")));
-        clickIfVisible(page.getByText("Properties", new Page.GetByTextOptions().setExact(true)));
+        clickIfVisible(frame.getByRole(AriaRole.TAB, new FrameLocator.GetByRoleOptions().setName("Properties")));
+        clickIfVisible(frame.getByText("Properties", new FrameLocator.GetByTextOptions().setExact(true)));
 
         fillFirstVisible(label,
-            page.getByLabel("Label", new Page.GetByLabelOptions().setExact(true)),
-            page.getByLabel("Name", new Page.GetByLabelOptions().setExact(true)),
-            page.locator("input[name*='label' i], input[aria-label*='label' i]").first()
+            frame.getByLabel("Label", new FrameLocator.GetByLabelOptions().setExact(true)),
+            frame.getByLabel("Name", new FrameLocator.GetByLabelOptions().setExact(true)),
+            frame.locator("input[name*='label' i], input[aria-label*='label' i]").first()
         );
 
         fillFirstVisible(hint,
-            page.getByLabel("Hint text", new Page.GetByLabelOptions().setExact(true)),
-            page.getByLabel("Hint", new Page.GetByLabelOptions().setExact(true)),
-            page.locator("input[name*='hint' i], textarea[name*='hint' i], input[aria-label*='hint' i]").first()
+            frame.getByLabel("Hint text", new FrameLocator.GetByLabelOptions().setExact(true)),
+            frame.getByLabel("Hint", new FrameLocator.GetByLabelOptions().setExact(true)),
+            frame.locator("input[name*='hint' i], textarea[name*='hint' i], input[aria-label*='hint' i]").first()
         );
 
         fillFirstVisible(minLength,
-            page.getByLabel("Minimum length", new Page.GetByLabelOptions().setExact(true)),
-            page.getByLabel("Min length", new Page.GetByLabelOptions().setExact(true)),
-            page.locator("input[name*='min' i], input[aria-label*='min' i]").first()
+            frame.getByLabel("Minimum length", new FrameLocator.GetByLabelOptions().setExact(true)),
+            frame.getByLabel("Min length", new FrameLocator.GetByLabelOptions().setExact(true)),
+            frame.locator("input[name*='min' i], input[aria-label*='min' i]").first()
         );
 
         fillFirstVisible(maxLength,
-            page.getByLabel("Maximum length", new Page.GetByLabelOptions().setExact(true)),
-            page.getByLabel("Max length", new Page.GetByLabelOptions().setExact(true)),
-            page.locator("input[name*='max' i], input[aria-label*='max' i]").first()
+            frame.getByLabel("Maximum length", new FrameLocator.GetByLabelOptions().setExact(true)),
+            frame.getByLabel("Max length", new FrameLocator.GetByLabelOptions().setExact(true)),
+            frame.locator("input[name*='max' i], input[aria-label*='max' i]").first()
         );
     }
 
     public void saveForm() {
         firstVisible(
+            frame.getByRole(AriaRole.BUTTON, new FrameLocator.GetByRoleOptions().setName("Save").setExact(true)),
+            frame.locator("[aria-label='Save'], [title='Save']").first(),
             page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save").setExact(true)),
             page.locator("[aria-label='Save'], [title='Save']").first()
         ).click();
@@ -63,9 +68,9 @@ public class FormBuilderPage {
 
     public void navigateToRulesTab() {
         firstVisible(
-            page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("Form rules")),
-            page.getByText("Form rules").first(),
-            page.getByText("Rules").first()
+            frame.getByRole(AriaRole.TAB, new FrameLocator.GetByRoleOptions().setName("Form rules")),
+            frame.getByText("Form rules").first(),
+            frame.getByText("Rules").first()
         ).click();
         page.waitForTimeout(1000);
     }
@@ -87,12 +92,14 @@ public class FormBuilderPage {
     }
 
     private Locator firstVisible(Locator... locators) {
-        for (Locator locator : locators) {
-            if (locator.count() > 0 && locator.first().isVisible()) {
-                return locator.first();
+        for (int i = 0; i < 20; i++) {
+            for (Locator locator : locators) {
+                if (locator.count() > 0 && locator.first().isVisible()) {
+                    return locator.first();
+                }
             }
+            page.waitForTimeout(500);
         }
-
         return locators[0].first();
     }
 }
