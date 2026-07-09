@@ -1,12 +1,13 @@
 package com.automationanywhere.api;
 
-import com.automationanywhere.models.LearningInstanceRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.Matchers.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.junit.jupiter.api.Assertions;
 
 public class LearningInstanceApiTest {
 
@@ -20,44 +21,43 @@ public class LearningInstanceApiTest {
 
     @Test
     public void testCreateLearningInstance() {
-        // Prepare the payload (Document type: Invoice)
-        LearningInstanceRequest requestPayload = new LearningInstanceRequest(
-                "TestInvoiceInstance_Automated_" + System.currentTimeMillis(),
-                "Automated API Test for Invoice Document Type"
-        );
+        System.out.println("=== TEST: CREATE LEARNING INSTANCE ===");
 
-        // API Endpoint with domain ID in path, language and provider as query params
-        String domainId = "33DED827-3DC4-4201-B478-7C15B94AF522";
-        String languageId = "B62EFA19-3592-4D2B-910A-E9C1C7DAE1A9";
-        String providerId = "B4DBACBA-5C86-4E32-A522-F668D48CC74B";
-        String endpoint = String.format("/cognitive/v3/learninginstances/%s?language=%s&provider=%s", 
-                                        domainId, languageId, providerId);
-
-        // Execute API Request
-        Response response = RestAssured
-            .given()
-                .spec(ApiConfig.getRequestSpec(token))
-                .body(requestPayload)
-            .when()
-                .post(endpoint) // Updated endpoint
-            .then()
-                .spec(ApiConfig.getResponseSpec())
-                .extract().response();
-                
-        System.out.println("Status Code: " + response.getStatusCode());
-        System.out.println("Response Body: " + response.getBody().asString());
-        
-        // Assertions
-        response.then().statusCode(anyOf(is(200), is(201)));
-        
-        // Try to extract an ID if it exists (might be "id", "instanceId", etc.)
         try {
-            String id = response.jsonPath().getString("id");
-            if (id != null) {
-                System.out.println("Successfully Created Learning Instance with ID: " + id);
-            }
+            // Read the exact payload we captured from the browser
+            Path path = Paths.get("src", "test", "resources", "learning_instance_payload.json");
+            String payloadStr = new String(Files.readAllBytes(path));
+
+            // Replace the static name with a dynamic one to avoid duplicates
+            String uniqueName = "API_Invoice_" + System.currentTimeMillis();
+            payloadStr = payloadStr.replace("\"TestInstance6\"", "\"" + uniqueName + "\"");
+
+            // Execute API Request
+            Response response = RestAssured
+                .given()
+                    .spec(ApiConfig.getRequestSpec(token))
+                    .body(payloadStr)
+                .when()
+                    .post("/cognitive/v3/learninginstances")
+                .then()
+                    .spec(ApiConfig.getResponseSpec())
+                    .extract().response();
+
+            // Validate Response
+            System.out.println("Status Code: " + response.getStatusCode());
+            System.out.println("Response Body: " + response.getBody().asPrettyString());
+            
+            // Allow 200 or 201
+            Assertions.assertTrue(
+                response.getStatusCode() == 200 || response.getStatusCode() == 201, 
+                "Expected 200 or 201 but got " + response.getStatusCode()
+            );
+
+            System.out.println("Successfully created Learning Instance: " + uniqueName);
+            System.out.println("======================================\n");
+            
         } catch (Exception e) {
-            System.out.println("Could not parse ID from response.");
+            Assertions.fail("Test failed: " + e.getMessage());
         }
     }
 }

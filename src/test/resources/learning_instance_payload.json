@@ -1,0 +1,85 @@
+{
+  "name": "TestInstance6",
+  "description": "",
+  "domainId": "33DED827-3DC4-4201-B478-7C15B94AF522",
+  "locale": "en-US",
+  "isCloudExtraction": false,
+  "domainLanguageId": "B62EFA19-3592-4D2B-910A-E9C1C7DAE1A9",
+  "isHeuristicFeedbackEnabled": true,
+  "isGenAIEnabled": true,
+  "genaiProvider": "Open_AI",
+  "modelConnectionId": "",
+  "modelConnectionName": "",
+  "selectedGenaiProvider": "Open_AI",
+  "isDefault": true,
+  "useGenai": true,
+  "domainLanguageProviderId": "D6CCA488-207A-4FCA-94E0-74E2FCA38B40",
+  "fields": [
+    {
+      "name": "invoice_number",
+      "displayName": "Invoice Number",
+      "dataType": "TEXT",
+      "featureType": "KEY_VALUE",
+      "confidenceThreshold": 0,
+      "defaultAliases": [
+        "invoice number"
+      ],
+      "domainObjectId": "DF559B75-80E3-4B8E-A4A5-F983E5E37C13",
+      "customAliases": [],
+      "description": "",
+      "isCustom": false,
+      "isRequired": true,
+      "isEnabled": true,
+      "domainVersion": "",
+      "isNormalizationEnabled": false,
+      "normalizationFormat": "",
+      "rules": [],
+      "useForExtraction": false,
+      "regexForExtraction": "",
+      "isFieldHeuristicFeedbackEnabled": true,
+      "searchQuery": {
+        "useSearchQuery": true,
+        "searchQueryValue": "What is the Invoice Number?"
+      }
+    }
+  ],
+  "tables": [
+    {
+      "name": "table",
+      "description": "",
+      "tableHeaders": [
+        {
+          "name": "description",
+          "displayName": "Description",
+          "dataType": "TEXT",
+          "featureType": "TABLE_HEADER",
+          "confidenceThreshold": 0,
+          "defaultAliases": [
+            "description"
+          ],
+          "domainObjectId": "9BB5E711-6B8B-4B4D-809B-856D6788E359",
+          "customAliases": [],
+          "description": "",
+          "isCustom": false,
+          "isRequired": true,
+          "isEnabled": true,
+          "domainVersion": "",
+          "isNormalizationEnabled": false,
+          "normalizationFormat": "",
+          "rules": [],
+          "useForExtraction": false,
+          "regexForExtraction": "",
+          "isFieldHeuristicFeedbackEnabled": true,
+          "searchQuery": {
+            "useSearchQuery": true,
+            "searchQueryValue": "What is the Description?"
+          }
+        }
+      ]
+    }
+  ],
+  "rules": [],
+  "genaiFeature": {
+    "tableFieldSupported": true
+  }
+}
