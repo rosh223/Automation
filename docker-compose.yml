@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  automation-tests:
+    # Use the Playwright Java image directly instead of a custom Dockerfile
+    image: mcr.microsoft.com/playwright/java:v1.44.0-jammy
+    container_name: aa-automation-tests
+    working_dir: /app
+    # Inject credentials securely from the local .env file
+    env_file:
+      - .env
+    volumes:
+      # Mount the entire current directory so the container has access to pom.xml and src/
+      - .:/app
+      # Persist Maven dependencies across runs so it doesn't download the internet every time
+      - maven-repo:/root/.m2
+    # The command to execute when the container starts
+    command: ["mvn", "clean", "test", "allure:report"]
+
+volumes:
+  maven-repo:
